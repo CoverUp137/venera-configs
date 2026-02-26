@@ -4,5 +4,11 @@
         "fileName": "gmh.js",
         "key": "gmh",
         "version": "1.0.0"
+    },
+    {
+        "name": "G社",
+        "fileName": "gmh2.js",
+        "key": "gmh2",
+        "version": "1.0.0"
     }
 ]
