@@ -1,3 +1,4 @@
+/** @type {import('./_venera_.js')} */
 /**
  * G社漫画 (G-MH) Venera 漫画源
  * 网站: https://m.g-mh.org/
