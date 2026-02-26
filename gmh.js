@@ -10,7 +10,7 @@ class GMH extends ComicSource {
     key = "gmh";
     version = "1.0.0";
     minAppVersion = "1.0.0";
-    url = "https://cdn.jsdelivr.net/gh/venera-app/venera-configs@main/gmh.js";
+    url = "https://cdn.jsdelivr.net/gh/CoverUp137/venera-configs@main/gmh.js";
 
     // 常量定义
     static baseUrl = "https://m.g-mh.org";
