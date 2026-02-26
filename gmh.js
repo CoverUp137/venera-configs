@@ -1,10 +1,4 @@
 /** @type {import('./_venera_.js')} */
-/**
- * G社漫画 (G-MH) Venera 漫画源
- * 网站: https://m.g-mh.org/
- * API: https://api-get-v2.mgsearcher.com/api/
- */
-
 class GMH extends ComicSource {
     // 基础配置
     name = "G社漫画";
@@ -15,7 +9,7 @@ class GMH extends ComicSource {
 
     // 常量定义
     static baseUrl = "https://m.g-mh.org";
-    static apiUrl = "https://api-get-v4.mgsearcher.com/api";
+    static apiUrl = "https://api-get-v2.mgsearcher.com/api";
     static imageBaseUrl = "https://f40-1-4.g-mh.online";
     
     static headers = {
