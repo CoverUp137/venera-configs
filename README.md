@@ -1,5 +1,7 @@
 # venera-configs
-
+```
+https://cdn.jsdelivr.net/gh/CoverUp137/venera-configs@main/index.json
+```
 Configuration file repository for venera
 
 ## Create a new configuration
