@@ -2,7 +2,7 @@
 class GmhSource extends ComicSource {
     name = "G社漫畫";
     key = "gmh2";
-    version = "1.0.0";
+    version = "1.0.1";
     minAppVersion = "1.0.0";
     url = "https://cdn.jsdelivr.net/gh/CoverUp137/venera-configs@main/gmh2.js";
 
@@ -33,11 +33,18 @@ class GmhSource extends ComicSource {
                 const title = a.find("div.font-bold.text-sm.line-clamp-2").text().trim();
                 const cover = img.attr("src") || img.attr("data-src");
                 const comicUrl = a.attr("href");
-                if (title && cover && comicUrl) {
+                // 从URL中提取ID
+                const idMatch = comicUrl.match(/\/manga\/([^\/]+)/);
+                const id = idMatch ? idMatch[1] : comicUrl;
+                
+                if (title && cover && id) {
                     comics.push(new Comic({
+                        id: id,  // 必须有id
                         title: title,
                         cover: cover,
-                        url: comicUrl,
+                        subTitle: null,
+                        tags: [],
+                        description: null,
                     }));
                 }
             });
@@ -62,15 +69,21 @@ class GmhSource extends ComicSource {
                     const title = $(el).find(".manga-item-2-title, .manga-item-1-title").text().trim() || a.attr("title");
                     const cover = img.attr("src") || img.attr("data-src");
                     const comicUrl = a.attr("href");
-                    if (title && cover && comicUrl) {
+                    const idMatch = comicUrl.match(/\/manga\/([^\/]+)/);
+                    const id = idMatch ? idMatch[1] : comicUrl;
+                    
+                    if (title && cover && id) {
                         comics.push(new Comic({
+                            id: id,
                             title: title,
                             cover: cover,
-                            url: comicUrl,
+                            subTitle: null,
+                            tags: [],
+                            description: null,
                         }));
                     }
                 });
-                return { comics: comics, maxPage: 1 }; // G社漫画首页没有分页，所以maxPage为1
+                return { comics: comics, maxPage: 1 };
             },
         },
         {
@@ -88,11 +101,17 @@ class GmhSource extends ComicSource {
                     const title = a.find("div.font-bold.text-sm.line-clamp-2").text().trim();
                     const cover = img.attr("src") || img.attr("data-src");
                     const comicUrl = a.attr("href");
-                    if (title && cover && comicUrl) {
+                    const idMatch = comicUrl.match(/\/manga\/([^\/]+)/);
+                    const id = idMatch ? idMatch[1] : comicUrl;
+                    
+                    if (title && cover && id) {
                         comics.push(new Comic({
+                            id: id,
                             title: title,
                             cover: cover,
-                            url: comicUrl,
+                            subTitle: null,
+                            tags: [],
+                            description: null,
                         }));
                     }
                 });
@@ -114,11 +133,17 @@ class GmhSource extends ComicSource {
                     const title = a.find("div.font-bold.text-sm.line-clamp-2").text().trim();
                     const cover = img.attr("src") || img.attr("data-src");
                     const comicUrl = a.attr("href");
-                    if (title && cover && comicUrl) {
+                    const idMatch = comicUrl.match(/\/manga\/([^\/]+)/);
+                    const id = idMatch ? idMatch[1] : comicUrl;
+                    
+                    if (title && cover && id) {
                         comics.push(new Comic({
+                            id: id,
                             title: title,
                             cover: cover,
-                            url: comicUrl,
+                            subTitle: null,
+                            tags: [],
+                            description: null,
                         }));
                     }
                 });
@@ -140,11 +165,17 @@ class GmhSource extends ComicSource {
                     const title = a.find("div.font-bold.text-sm.line-clamp-2").text().trim();
                     const cover = img.attr("src") || img.attr("data-src");
                     const comicUrl = a.attr("href");
-                    if (title && cover && comicUrl) {
+                    const idMatch = comicUrl.match(/\/manga\/([^\/]+)/);
+                    const id = idMatch ? idMatch[1] : comicUrl;
+                    
+                    if (title && cover && id) {
                         comics.push(new Comic({
+                            id: id,
                             title: title,
                             cover: cover,
-                            url: comicUrl,
+                            subTitle: null,
+                            tags: [],
+                            description: null,
                         }));
                     }
                 });
@@ -155,7 +186,7 @@ class GmhSource extends ComicSource {
 
     // 搜索功能
     search = {
-        load: async (keyword, page) => {
+        load: async (keyword, options, page) => {
             const url = `https://m.g-mh.org/s/${encodeURIComponent(keyword)}`;
             const res = await Network.get(url);
             const $ = Html.parse(res.data);
@@ -167,67 +198,106 @@ class GmhSource extends ComicSource {
                 const title = a.find("div.font-bold.text-sm.line-clamp-2").text().trim();
                 const cover = img.attr("src") || img.attr("data-src");
                 const comicUrl = a.attr("href");
-                if (title && cover && comicUrl) {
+                const idMatch = comicUrl.match(/\/manga\/([^\/]+)/);
+                const id = idMatch ? idMatch[1] : comicUrl;
+                
+                if (title && cover && id) {
                     comics.push(new Comic({
+                        id: id,
                         title: title,
                         cover: cover,
-                        url: comicUrl,
+                        subTitle: null,
+                        tags: [],
+                        description: null,
                     }));
                 }
             });
-            return { comics: comics, maxPage: 1 }; // 搜索结果页也没有分页
+            return { comics: comics, maxPage: 1 };
         },
     };
 
-    // 漫画详情页
-    loadComicInfo = async (comicUrl) => {
-        const res = await Network.get(comicUrl);
-        const $ = Html.parse(res.data);
+    // 漫画详情页 - 新版结构
+    comic = {
+        // 加载漫画详情
+        loadInfo: async (id) => {
+            const comicUrl = `https://m.g-mh.org/manga/${id}`;
+            const res = await Network.get(comicUrl);
+            const $ = Html.parse(res.data);
 
-        const title = $("h1").text().trim().replace(" 連載中", "").replace(" 已完结", "");
-        const cover = $("img.rounded-xl").attr("src");
-        const description = $(".manga-description").text().trim();
-        const author = $("a[href*=\"/author/\"]").text().trim();
-        const status = $("span.badge.badge-primary").text().trim(); // 需要确认选择器
-        const genres = [];
-        $("a[href*=\"/manga-tag/\"]").each((i, el) => {
-            genres.push($(el).text().trim().replace("#", ""));
-        });
+            const title = $("h1").text().trim().replace(" 連載中", "").replace(" 已完结", "");
+            const cover = $("img.rounded-xl").attr("src");
+            const description = $(".manga-description").text().trim();
+            const author = $("a[href*=\"/author/\"]").text().trim();
+            const status = $("span.badge.badge-primary").text().trim();
+            
+            const genres = [];
+            $("a[href*=\"/manga-tag/\"]").each((i, el) => {
+                genres.push($(el).text().trim().replace("#", ""));
+            });
 
-        const chapters = [];
-        $("#sortchapters a").each((i, el) => {
-            chapters.push(new Chapter({
-                title: $(el).text().trim(),
-                url: $(el).attr("href"),
-            }));
-        });
+            // 构建章节Map
+            const chapters = new Map();
+            $("#sortchapters a").each((i, el) => {
+                const chapterTitle = $(el).text().trim();
+                const chapterUrl = $(el).attr("href");
+                const chapterIdMatch = chapterUrl.match(/\/chapter\/([^\/]+)/);
+                const chapterId = chapterIdMatch ? chapterIdMatch[1] : chapterUrl;
+                chapters.set(chapterId, chapterTitle);
+            });
 
-        return new Comic({
-            title: title,
-            cover: cover,
-            url: comicUrl,
-            description: description,
-            author: author,
-            status: status,
-            genres: genres,
-            chapters: chapters,
-        });
-    };
+            return {
+                title: title,
+                cover: cover,
+                description: description,
+                tags: {
+                    "作者": author ? [author] : [],
+                    "标签": genres,
+                    "状态": status ? [status] : [],
+                },
+                chapters: chapters,
+                subId: null,
+                isFavorite: false,
+            };
+        },
 
-    // 章节内容页
-    loadChapter = async (chapterUrl) => {
-        const res = await Network.get(chapterUrl);
-        const $ = Html.parse(res.data);
+        // 加载章节图片
+        loadEp: async (comicId, epId) => {
+            const chapterUrl = `https://m.g-mh.org/chapter/${epId}`;
+            const res = await Network.get(chapterUrl);
+            const $ = Html.parse(res.data);
 
-        const images = [];
-        $("main img").each((i, el) => {
-            const src = $(el).attr("src") || $(el).attr("data-src") || $(el).attr("data-original");
-            if (src && !src.includes("logo") && !src.includes("ad")) {
-                images.push(src);
-            }
-        });
+            const images = [];
+            $("main img").each((i, el) => {
+                const src = $(el).attr("src") || $(el).attr("data-src") || $(el).attr("data-original");
+                if (src && !src.includes("logo") && !src.includes("ad")) {
+                    images.push(src);
+                }
+            });
 
-        return images;
+            return {
+                images: images,
+            };
+        },
+
+        // [Optional] 加载缩略图 - 这是修复错误的关键
+        loadThumbnails: async (id, next) => {
+            // 如果网站支持缩略图预览，在这里实现
+            // 返回空数组表示没有缩略图
+            return {
+                thumbnails: [],
+                next: null,
+            };
+        },
+
+        // [Optional] 图片加载配置
+        onImageLoad: (url, comicId, epId) => {
+            return {};
+        },
+
+        // [Optional] 缩略图加载配置
+        onThumbnailLoad: (url) => {
+            return {};
+        },
     };
 }
 
