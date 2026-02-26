@@ -15,7 +15,7 @@ class GMH extends ComicSource {
 
     // 常量定义
     static baseUrl = "https://m.g-mh.org";
-    static apiUrl = "https://api-get-v2.mgsearcher.com/api";
+    static apiUrl = "https://api-get-v4.mgsearcher.com/api";
     static imageBaseUrl = "https://f40-1-4.g-mh.online";
     
     static headers = {
